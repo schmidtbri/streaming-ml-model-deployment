@@ -1,0 +1,57 @@
+name: Build
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+
+  setup-environment:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install --upgrade setuptools
+        python -m pip install --upgrade wheel
+        make dependencies
+
+    - name: Install Test Dependencies
+      run : make test-dependencies
+
+    - name: Check Codestyle
+      run: make check-codestyle
+
+    - name: Check Docstyle
+      run: make check-docstyle
+
+    - name: Check Security Issues
+      run: make check-security
+
+    - name: Check Dependency Security
+      run: make check-dependencies
+
+    - name: Run Unit Tests
+      run: make test-reports
+
+    - name: Archive Unit Test Report
+      uses: actions/upload-artifact@v1
+      with:
+        name: unit-test-report
+        path: reports/unit_tests
+
+    - name: Archive Code Coverage Report
+      uses: actions/upload-artifact@v1
+      with:
+        name: code-coverage-report
+        path: reports/coverage
