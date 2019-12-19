@@ -1,7 +1,7 @@
 """Configuration for the faust application."""
 
 
-class Config(object):
+class Config(dict):
     """Configuration for all environments."""
 
     models = [
@@ -15,26 +15,26 @@ class Config(object):
 class ProdConfig(Config):
     """Configuration for the prod environment."""
 
-    broker = 'kafka://localhost:9092'
-    value_serializer = 'raw'
+    bootstrap_servers = 'localhost:9092'
+    async_produce = False
 
 
 class BetaConfig(Config):
     """Configuration for the beta environment."""
 
-    broker = 'kafka://localhost:9092'
-    value_serializer = 'raw'
+    bootstrap_servers = 'localhost:9092'
+    async_produce = False
 
 
 class TestConfig(Config):
     """Configuration for the test environment."""
 
-    broker = 'kafka://localhost:9092'
-    value_serializer = 'raw'
+    bootstrap_servers = 'localhost:9092'
+    async_produce = False
 
 
 class DevConfig(Config):
     """Configuration for the dev environment."""
 
-    broker = 'kafka://localhost:9092'
-    value_serializer = 'raw'
+    bootstrap_servers = 'localhost:9092'
+    async_produce = False
