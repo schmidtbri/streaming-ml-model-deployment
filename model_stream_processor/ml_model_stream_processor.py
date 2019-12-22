@@ -1,7 +1,12 @@
 """Faust agent hosts an MlModel object."""
+import logging
+import json
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 
+from model_stream_processor import __name__
 from model_stream_processor.model_manager import ModelManager
+
+logger = logging.getLogger(__name__)
 
 
 class MLModelStreamProcessor(object):
@@ -23,6 +28,8 @@ class MLModelStreamProcessor(object):
         model_manager = ModelManager()
         self._model = model_manager.get_model(model_qualified_name)
 
+        logger.info("Initializing stream processor for model: {}".format(self._model.qualified_name))
+
         if self._model is None:
             raise ValueError("'{}' not found in ModelManager instance.".format(model_qualified_name))
 
@@ -33,9 +40,11 @@ class MLModelStreamProcessor(object):
         # the topic to which the model will send prediction errors
         self.error_producer_topic = "model_stream_processor.{}.{}.{}.errors".format(model_qualified_name, self._model.major_version, self._model.minor_version)
 
-        print(self.consumer_topic)
+        logger.info("Consuming messages from topic {}.".format(self.consumer_topic))
+        logger.info("Producing messages to topics {} and {}.".format(self.producer_topic, self.error_producer_topic))
 
-        self._consumer = AIOKafkaConsumer(self.consumer_topic, loop=loop, bootstrap_servers=bootstrap_servers, group_id="my-group")
+        self._consumer = AIOKafkaConsumer(self.consumer_topic, loop=loop, bootstrap_servers=bootstrap_servers,
+                                          group_id=__name__)
         self._producer = AIOKafkaProducer(loop=loop, bootstrap_servers=bootstrap_servers)
 
     def __repr__(self):
@@ -44,20 +53,23 @@ class MLModelStreamProcessor(object):
 
     async def start(self):
         """Start the consumers and producers."""
+        logger.info("{} stream processor: Starting consumer and producer.".format(self._model.qualified_name))
         await self._consumer.start()
         await self._producer.start()
 
     async def process(self):
         """Make predictions on records in a stream."""
-        async for msg in self._consumer:
+        async for message in self._consumer:
             try:
-                result = self._model.predict(data=msg.value)
-                print("consumed: ", msg.topic, msg.partition, msg.offset, msg.key, msg.value, msg.timestamp)
-                await self._producer.send_and_wait(self.producer_topic, bytes(result))
-            except:
-                await self._producer.send_and_wait(self.error_producer_topic, msg.value)
+                data = json.loads(message.value)
+                prediction = self._model.predict(data=data)
+                await self._producer.send_and_wait(self.producer_topic, json.dumps(prediction).encode())
+            except Exception as e:
+                logger.error("Exception: {}".format(str(e)))
+                await self._producer.send_and_wait(self.error_producer_topic, message.value)
 
     async def stop(self):
-        """"""
+        """Stop the streaming processor."""
+        logger.info("{} stream processor: Stopping consumer and producer.".format(self._model.qualified_name))
         await self._consumer.stop()
         await self._producer.stop()

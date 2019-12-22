@@ -1,12 +1,10 @@
-import pytest
 import unittest
 from unittest import TestCase
-import faust
 from ml_model_abc import MLModel
 from tests.helper import _run
 
 from model_stream_processor.model_manager import ModelManager
-from model_stream_processor.ml_model_agent import MLModelAgent
+from model_stream_processor.ml_model_stream_processor import MLModelStreamProcessor
 
 
 # creating an MLModel class to test with
@@ -27,7 +25,7 @@ class MLModelMock(MLModel):
         return data
 
 
-class MLModelAgentTests(TestCase):
+class MLModelStreamProcessorTests(TestCase):
 
     def test1(self):
         """  """
@@ -40,7 +38,7 @@ class MLModelAgentTests(TestCase):
             }
         ])
 
-        app = faust.App('test app')
+
 
         source_channel = app.channel()
         destination_channel = app.channel()
