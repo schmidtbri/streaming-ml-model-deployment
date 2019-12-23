@@ -27,13 +27,11 @@ class ModelManager(object):
     @classmethod
     def get_models(cls):
         """Get a list of models in the model manager instance."""
-        model_objects = [{
-            "display_name": model.display_name,
-            "qualified_name": model.qualified_name,
-            "description": model.description,
-            "major_version": model.major_version,
-            "minor_version": model.minor_version} for model in cls._models]
-
+        model_objects = [{"display_name": model.display_name,
+                          "qualified_name": model.qualified_name,
+                          "description": model.description,
+                          "major_version": model.major_version,
+                          "minor_version": model.minor_version} for model in cls._models]
         return model_objects
 
     @classmethod

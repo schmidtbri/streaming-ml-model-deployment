@@ -22,7 +22,6 @@ setup(
     packages=["model_stream_processor"],
     python_requires=">=3.5",
     install_requires=["iris-model@git+https://github.com/schmidtbri/ml-model-abc-improvements#egg=iris_model@master",
-                      "faust",
-                      "python-schema-registry-client[faust]"],
+                      "aiokafka"],
     tests_require=['pytest', 'pytest-html', 'pylama', 'coverage', 'coverage-badge', 'bandit', 'safety']
 )

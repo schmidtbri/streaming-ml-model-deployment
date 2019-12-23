@@ -1,8 +1,9 @@
 import unittest
 from unittest import TestCase
-from ml_model_abc import MLModel
-from tests.helper import _run
+from unittest.mock import Mock
+import asyncio
 
+from ml_model_abc import MLModel
 from model_stream_processor.model_manager import ModelManager
 from model_stream_processor.ml_model_stream_processor import MLModelStreamProcessor
 
@@ -28,7 +29,7 @@ class MLModelMock(MLModel):
 class MLModelStreamProcessorTests(TestCase):
 
     def test1(self):
-        """  """
+        """testing the __init__() method"""
         # arrange
         model_manager = ModelManager()
         model_manager.load_models(configuration=[
@@ -37,24 +38,21 @@ class MLModelStreamProcessorTests(TestCase):
                 "class_name": "MLModelMock"
             }
         ])
-
-
-
-        source_channel = app.channel()
-        destination_channel = app.channel()
-
-        #ml_model_agent = MLModelAgent(app=app,
-        #                              model_qualified_name="qualified_name",
-        #                              source_stream=source_channel,
-        #                              destination_stream=destination_channel)
-
-        #app.agents["qualified_name"] = ml_model_agent
+        loop = asyncio.get_event_loop()
+        asyncio.set_event_loop(loop)
 
         # act
-        _run(source_channel.put(1))
+        processor = MLModelStreamProcessor(model_qualified_name="qualified_name",
+                                           loop=loop,
+                                           bootstrap_servers=None)
 
         # assert
-        print(source_channel.empty())
+        self.assertTrue(processor.consumer_topic == "model_stream_processor.{}.{}.{}.inputs".format("qualified_name", 1, 1))
+        self.assertTrue(processor.producer_topic == "model_stream_processor.{}.{}.{}.outputs".format("qualified_name", 1, 1))
+        self.assertTrue(processor.error_producer_topic == "model_stream_processor.{}.{}.{}.errors".format("qualified_name", 1, 1))
+
+        # closing the processor
+        loop.run_until_complete(processor.stop())
 
 
 if __name__ == '__main__':

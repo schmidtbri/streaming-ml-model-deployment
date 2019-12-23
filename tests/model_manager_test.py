@@ -103,6 +103,30 @@ class ModelManagerTests(unittest.TestCase):
         self.assertTrue(exception_raised)
         self.assertTrue(exception_message == "The ModelManager can only hold references to objects of type MLModel.")
 
+    def test4(self):
+        """ testing that the ModelManager returns None when a model is not found """
+        # arrange
+        model_manager = ModelManager()
+        model_manager.load_models(configuration=[
+            {
+                "module_name": "tests.model_manager_test",
+                "class_name": "MLModelMock"
+            }
+        ])
+
+        # act
+        exception_raised = False
+        exception_message = ""
+        try:
+            model = model_manager.get_model(qualified_name="asdf")
+        except Exception as e:
+            exception_raised = True
+            exception_message = str(e)
+
+        # assert
+        self.assertFalse(exception_raised)
+        self.assertTrue(model is None)
+
 
 if __name__ == '__main__':
     unittest.main()

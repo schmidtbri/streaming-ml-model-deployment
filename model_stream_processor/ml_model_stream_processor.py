@@ -34,11 +34,17 @@ class MLModelStreamProcessor(object):
             raise ValueError("'{}' not found in ModelManager instance.".format(model_qualified_name))
 
         # the topic from which the model will receive prediction inputs
-        self.consumer_topic = "model_stream_processor.{}.{}.{}.inputs".format(model_qualified_name, self._model.major_version, self._model.minor_version)
+        self.consumer_topic = "model_stream_processor.{}.{}.{}.inputs".format(model_qualified_name,
+                                                                              self._model.major_version,
+                                                                              self._model.minor_version)
         # the topic to which the model will send prediction outputs
-        self.producer_topic = "model_stream_processor.{}.{}.{}.outputs".format(model_qualified_name, self._model.major_version, self._model.minor_version)
+        self.producer_topic = "model_stream_processor.{}.{}.{}.outputs".format(model_qualified_name,
+                                                                               self._model.major_version,
+                                                                               self._model.minor_version)
         # the topic to which the model will send prediction errors
-        self.error_producer_topic = "model_stream_processor.{}.{}.{}.errors".format(model_qualified_name, self._model.major_version, self._model.minor_version)
+        self.error_producer_topic = "model_stream_processor.{}.{}.{}.errors".format(model_qualified_name,
+                                                                                    self._model.major_version,
+                                                                                    self._model.minor_version)
 
         logger.info("Consuming messages from topic {}.".format(self.consumer_topic))
         logger.info("Producing messages to topics {} and {}.".format(self.producer_topic, self.error_producer_topic))
@@ -48,6 +54,7 @@ class MLModelStreamProcessor(object):
         self._producer = AIOKafkaProducer(loop=loop, bootstrap_servers=bootstrap_servers)
 
     def __repr__(self):
+        """Return string representation of stream processor."""
         return "{} model: {} version: {}".format(super().__repr__(), self._model.qualified_name,
                                                  str(self._model.major_version) + "." + str(self._model.minor_version))
 
@@ -63,9 +70,10 @@ class MLModelStreamProcessor(object):
             try:
                 data = json.loads(message.value)
                 prediction = self._model.predict(data=data)
-                await self._producer.send_and_wait(self.producer_topic, json.dumps(prediction).encode())
+                serialized_prediction = json.dumps(prediction).encode()
+                await self._producer.send_and_wait(self.producer_topic, serialized_prediction)
             except Exception as e:
-                logger.error("Exception: {}".format(str(e)))
+                logger.error("{} stream processor: Exception: {}".format(self._model.qualified_name, str(e)))
                 await self._producer.send_and_wait(self.error_producer_topic, message.value)
 
     async def stop(self):
