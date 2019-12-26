@@ -1,4 +1,4 @@
-"""Faust agent hosts an MlModel object."""
+"""Class to host an MlModel object."""
 import logging
 import json
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer

@@ -1,4 +1,4 @@
-"""Configuration for the faust application."""
+"""Configuration for the application."""
 
 
 class Config(dict):
