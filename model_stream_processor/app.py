@@ -11,7 +11,7 @@ from model_stream_processor.ml_model_stream_processor import MLModelStreamProces
 logging.basicConfig(level=logging.INFO)
 
 # importing the right configuration
-configuration = __import__("model_stream_processor").\
+configuration = __import__("model_stream_processor"). \
     __getattribute__("config"). \
     __getattribute__(os.environ["APP_SETTINGS"])
 

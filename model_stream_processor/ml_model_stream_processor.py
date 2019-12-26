@@ -33,18 +33,15 @@ class MLModelStreamProcessor(object):
         if self._model is None:
             raise ValueError("'{}' not found in ModelManager instance.".format(model_qualified_name))
 
+        base_topic_name = "model_stream_processor.{}.{}.{}".format(model_qualified_name,
+                                                                   self._model.major_version,
+                                                                   self._model.minor_version)
         # the topic from which the model will receive prediction inputs
-        self.consumer_topic = "model_stream_processor.{}.{}.{}.inputs".format(model_qualified_name,
-                                                                              self._model.major_version,
-                                                                              self._model.minor_version)
+        self.consumer_topic = "{}.inputs".format(base_topic_name)
         # the topic to which the model will send prediction outputs
-        self.producer_topic = "model_stream_processor.{}.{}.{}.outputs".format(model_qualified_name,
-                                                                               self._model.major_version,
-                                                                               self._model.minor_version)
+        self.producer_topic = "{}.outputs".format(base_topic_name)
         # the topic to which the model will send prediction errors
-        self.error_producer_topic = "model_stream_processor.{}.{}.{}.errors".format(model_qualified_name,
-                                                                                    self._model.major_version,
-                                                                                    self._model.minor_version)
+        self.error_producer_topic = "{}.errors".format(base_topic_name)
 
         logger.info("Consuming messages from topic {}.".format(self.consumer_topic))
         logger.info("Producing messages to topics {} and {}.".format(self.producer_topic, self.error_producer_topic))
