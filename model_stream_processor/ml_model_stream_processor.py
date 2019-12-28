@@ -43,8 +43,11 @@ class MLModelStreamProcessor(object):
         # the topic to which the model will send prediction errors
         self.error_producer_topic = "{}.errors".format(base_topic_name)
 
-        logger.info("{} stream processor: Consuming messages from topic {}.".format(self._model.qualified_name, self.consumer_topic))
-        logger.info("{} stream processor: Producing messages to topics {} and {}.".format(self._model.qualified_name, self.producer_topic, self.error_producer_topic))
+        logger.info("{} stream processor: Consuming messages from topic {}.".format(self._model.qualified_name,
+                                                                                    self.consumer_topic))
+        logger.info("{} stream processor: Producing messages to topics {} and {}.".format(self._model.qualified_name,
+                                                                                          self.producer_topic,
+                                                                                          self.error_producer_topic))
 
         self._consumer = AIOKafkaConsumer(self.consumer_topic, loop=loop, bootstrap_servers=bootstrap_servers,
                                           group_id=__name__)
