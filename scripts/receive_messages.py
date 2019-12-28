@@ -10,7 +10,7 @@ async def main(loop, topic, bootstrap_servers):
 
     try:
         async for msg in consumer:
-            print("consumed: ", msg.value)
+            print(msg.value.decode())
     except KeyboardInterrupt:
         await consumer.stop()
         return
