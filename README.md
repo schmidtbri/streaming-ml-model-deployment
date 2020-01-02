@@ -3,9 +3,9 @@ Deploying an ML model in a KAfka streaming processor.
 
 ![](https://github.com/schmidtbri/streaming-ml-model-deployment/workflows/Build/badge.svg)
 
-Deploying an ML model in AWS Lambda.
+Deploying an ML model as a Kafka stream processor.
 
-This code is used in this [blog post]().
+This code is used in this [blog post](https://medium.com/@brianschmidt_78145/a-streaming-ml-model-deployment-3c3fddc8921c).
 
 ## Requirements
 
