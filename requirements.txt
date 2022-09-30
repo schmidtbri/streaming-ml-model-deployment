@@ -1,7 +1,7 @@
 aiokafka==0.5.2
 contextlib2==0.5.5
 git+https://github.com/schmidtbri/ml-model-abc-improvements#egg=iris_model
-joblib==0.14.1
+joblib==1.2.0
 kafka-python==1.4.6
 numpy==1.18.0
 schema==0.7.0
